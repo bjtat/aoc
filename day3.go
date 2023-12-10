@@ -70,22 +70,22 @@ func detectGear(grid [][]string, c coord) bool {
 func tagGearsNextToNumber(grid [][]string, c coord, firstIndex, num int) {
 	for i := c.x - 1; i <= c.x+1; i++ {
 		if strings.ContainsAny(grid[i][firstIndex-1], "*") {
-			fmt.Printf("FOUND foo num: %d, [%d, %d]\n", num, i, firstIndex-1)
+			fmt.Printf("num: %d, [%d, %d]\n", num, i, firstIndex-1)
 		}
 	}
 
 	for i := firstIndex; i <= c.y; i++ {
 		if strings.ContainsAny(grid[c.x-1][i], "*") {
-			fmt.Printf("FOUND bar num: %d, [%d, %d]\n", num, c.x-1, i)
+			fmt.Printf("num: %d, [%d, %d]\n", num, c.x-1, i)
 		}
 		if strings.ContainsAny(grid[c.x+1][i], "*") {
-			fmt.Printf("FOUND bar 2 num: %d, [%d, %d]\n", num, c.x+1, i)
+			fmt.Printf("num: %d, [%d, %d]\n", num, c.x+1, i)
 		}
 	}
 
 	for i := c.x - 1; i <= c.x+1; i++ {
 		if strings.ContainsAny(grid[i][c.y+1], "*") {
-			fmt.Printf("FOUND baz num: %d, [%d, %d]\n", num, i, c.y+1)
+			fmt.Printf("num: %d, [%d, %d]\n", num, i, c.y+1)
 		}
 	}
 }
@@ -147,6 +147,87 @@ func generateNumberFromLastIndex(grid [][]string, c coord) int {
 	}
 }
 
+func checkAroundGear(grid [][]string, c coord) int {
+	uniqueSet := make(map[int]bool, 6)
+
+	if strings.ContainsAny(grid[c.x][c.y-1], "0123456789") {
+		num := generateNumberFromAnyIndex(grid, coord{c.x, c.y - 1})
+		_, ok := uniqueSet[num]
+		if !ok {
+			uniqueSet[num] = true
+		}
+	}
+
+	for i := c.y - 1; i <= c.y+1; i++ {
+		if strings.ContainsAny(grid[c.x-1][i], "0123456789") {
+			num := generateNumberFromAnyIndex(grid, coord{c.x - 1, i})
+			_, ok := uniqueSet[num]
+			if !ok {
+				uniqueSet[num] = true
+			}
+		}
+		if strings.ContainsAny(grid[c.x+1][i], "0123456789") {
+			num := generateNumberFromAnyIndex(grid, coord{c.x + 1, i})
+			_, ok := uniqueSet[num]
+			if !ok {
+				uniqueSet[num] = true
+			}
+		}
+	}
+
+	if strings.ContainsAny(grid[c.x][c.y+1], "0123456789") {
+		num := generateNumberFromAnyIndex(grid, coord{c.x, c.y + 1})
+		_, ok := uniqueSet[num]
+		if !ok {
+			uniqueSet[num] = true
+		}
+	}
+
+	valid := 0
+	answer := 1
+	for num, ok := range uniqueSet {
+		if ok {
+			valid++
+			answer *= num
+		}
+	}
+
+	if valid == 2 {
+		fmt.Printf("gear ratio: %d\n", answer)
+		return answer
+	}
+	return 0
+}
+
+func generateNumberFromAnyIndex(grid [][]string, c coord) int {
+	numStr := ""
+	maxPossibleIndex := len(grid[0])
+	firstIndexOfNum := 0
+
+	for someIndex := c.y; someIndex > 0; someIndex-- {
+		if strings.ContainsAny(grid[c.x][someIndex], "0123456789") {
+			firstIndexOfNum = someIndex
+		} else {
+			break
+		}
+	}
+
+	for i := firstIndexOfNum; i < maxPossibleIndex; i++ {
+		if strings.ContainsAny(grid[c.x][i], "0123456789") {
+			numStr = numStr + grid[c.x][i]
+		} else {
+			break
+		}
+	}
+
+	num, err := strconv.Atoi(numStr)
+	if err != nil {
+		return -1
+	}
+
+	return num
+}
+
 func checkLine(grid [][]string, x int) int {
 	gridLine := grid[x]
 	num := 0
@@ -160,18 +241,19 @@ func checkLine(grid [][]string, x int) int {
 
 func checkLineWithGears(grid [][]string, x int) int {
 	gridLine := grid[x]
-	num := 0
+	answer := 0
 	for i := 0; i < len(gridLine); i++ {
-		if strings.ContainsAny(gridLine[i], "01234567899") && !strings.ContainsAny(gridLine[i+1], "0123456789") {
-			num += generateNumberFromLastIndexWithGear(grid, coord{x, i})
+		if strings.ContainsAny(gridLine[i], "*") {
+			fmt.Printf("FOUND GEAR: [%d, %d]\n", x, i)
+			answer += checkAroundGear(grid, coord{x, i})
 		}
 	}
-	return num
+	return answer
 }
 
 func main() {
-	// fileBytes, _ := os.ReadFile("aoc-day-3.txt")
-	fileBytes, _ := os.ReadFile("sample.txt")
+	fileBytes, _ := os.ReadFile("aoc-day-3.txt")
+	// fileBytes, _ := os.ReadFile("sample.txt")
 	grid := generateGrid(fileBytes)
 
 	for _, gridLine := range grid {
@@ -182,13 +264,18 @@ func main() {
 	// detectSymbol(grid, coord{1, 2})
 	// detectSymbol(grid, coord{1, 3})
 
-	// answer := 0
-	// for i, _ := range grid {
-	// 	answer += checkLineWithGears(grid, i)
-	// }
+	answer := 0
+	for i, _ := range grid {
+		answer += checkLineWithGears(grid, i)
+	}
+	fmt.Println(answer)
+
+	// generateNumberFromAnyIndex(grid, coord{1, 1})
+	// generateNumberFromAnyIndex(grid, coord{1, 2})
+	// generateNumberFromAnyIndex(grid, coord{1, 3})
 
 	// generateNumberFromLastIndex(grid, coord{1, 3})
 	// generateNumberFromLastIndex(grid, coord{1, 8})
 
-	tagGearsNextToNumber(grid, coord{1, 3}, 1, 467)
+	// tagGearsNextToNumber(grid, coord{1, 3}, 1, 467)
 }

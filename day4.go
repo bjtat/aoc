@@ -43,19 +43,45 @@ func calculatePoints(set map[string]bool, actualNumbers []string) int {
 	return 0
 }
 
+func addCards(cards *[250]int, set map[string]bool, actualNumbers []string, cardNum int) {
+	points := 0
+	for _, num := range actualNumbers {
+		_, seen := set[num]
+		if seen {
+			points += 1
+		}
+	}
+
+	numCopies := cards[cardNum]
+	for i := 1; i <= points; i++ {
+		fmt.Printf("appending %d copies to %d\n", numCopies, cardNum+i)
+		cards[cardNum+i] += numCopies
+	}
+}
+
 func main() {
+	cards := [250]int{}
+	fmt.Println(cards)
+
 	fileBytes, _ := os.ReadFile("aoc-day-4.txt")
 	trimmedFile := strings.TrimSpace(string(fileBytes))
 	linesArray := strings.Split(trimmedFile, "\n")
 
-	answer := 0
-	for _, line := range linesArray {
+	for i, line := range linesArray {
+		cards[i+1] += 1
 		winning, actual := parseNumbers(line)
 		fmt.Println(winning, actual)
 		seenNumberSet := generateSet(winning)
 		fmt.Println(seenNumberSet)
-		answer += calculatePoints(seenNumberSet, actual)
+
+		addCards(&cards, seenNumberSet, actual, i+1)
 	}
 
+	fmt.Println(cards)
+
+	answer := 0
+	for _, copies := range cards {
+		answer += copies
+	}
 	fmt.Println(answer)
 }

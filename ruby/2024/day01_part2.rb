@@ -1,5 +1,7 @@
+require_relative '../utils/paths'
+
 lhs = rhs = []
-File.open('day01.txt', 'r') do |f|
+File.open(AocUtils.input_path(2024, 1), 'r') do |f|
   f.each_line do |line|
     left, right = line.split.map(&:to_i)
     lhs << left.to_i

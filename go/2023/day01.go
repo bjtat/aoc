@@ -1,9 +1,13 @@
+//go:build day01
+
 package main
 
 import (
 	"fmt"
 	"os"
 	"strings"
+
+	"aoc/go/utils"
 )
 
 const (
@@ -38,7 +42,8 @@ func convertToNumber(firstDigit byte, secondDigit byte) int {
 }
 
 func main() {
-	fileBytes, _ := os.ReadFile("aoc-day-1.txt")
+	inputPath, _ := utils.GetInputPath(2023, 1)
+	fileBytes, _ := os.ReadFile(inputPath)
 	cleanstring := string(fileBytes)
 	fileString := string(fileBytes)
 	fileString = strings.ReplaceAll(fileString, "one", "o1ne")
@@ -55,6 +60,7 @@ func main() {
 
 	for _, line := range linesArray {
 		fmt.Println(line)
+		fmt.Printf("something %s", line)
 	}
 
 	answer := 0

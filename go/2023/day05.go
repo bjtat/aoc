@@ -1,3 +1,5 @@
+//go:build day05
+
 package main
 
 import "fmt"

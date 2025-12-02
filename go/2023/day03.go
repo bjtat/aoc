@@ -1,3 +1,5 @@
+//go:build day03
+
 package main
 
 import (
@@ -5,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"aoc/go/utils"
 )
 
 // we wants a map where k= gear coord and v = the numbers that are valid next to it
@@ -252,7 +256,8 @@ func checkLineWithGears(grid [][]string, x int) int {
 }
 
 func main() {
-	fileBytes, _ := os.ReadFile("aoc-day-3.txt")
+	inputPath, _ := utils.GetInputPath(2023, 3)
+	fileBytes, _ := os.ReadFile(inputPath)
 	// fileBytes, _ := os.ReadFile("sample.txt")
 	grid := generateGrid(fileBytes)
 

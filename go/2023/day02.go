@@ -1,3 +1,5 @@
+//go:build day02
+
 package main
 
 import (
@@ -5,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"aoc/go/utils"
 )
 
 func parseGames(gamesList []string, gameId, r, g, b int) bool {
@@ -84,7 +88,8 @@ func validateValue2(values []string) int {
 }
 
 func main() {
-	fileBytes, _ := os.ReadFile("aoc-day-2.txt")
+	inputPath, _ := utils.GetInputPath(2023, 2)
+	fileBytes, _ := os.ReadFile(inputPath)
 	linesArray := strings.Split(string(fileBytes), "\n")
 
 	// for i, line := range linesArray {

@@ -1,3 +1,5 @@
+//go:build day04
+
 package main
 
 import (
@@ -5,6 +7,8 @@ import (
 	"math"
 	"os"
 	"strings"
+
+	"aoc/go/utils"
 )
 
 func parseNumbers(line string) ([]string, []string) {
@@ -63,7 +67,8 @@ func main() {
 	cards := [250]int{}
 	fmt.Println(cards)
 
-	fileBytes, _ := os.ReadFile("aoc-day-4.txt")
+	inputPath, _ := utils.GetInputPath(2023, 4)
+	fileBytes, _ := os.ReadFile(inputPath)
 	trimmedFile := strings.TrimSpace(string(fileBytes))
 	linesArray := strings.Split(trimmedFile, "\n")
 

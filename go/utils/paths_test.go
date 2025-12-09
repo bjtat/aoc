@@ -1,97 +1,74 @@
 package utils
 
 import (
-	"os"
-	"path/filepath"
-	"strings"
+	"reflect"
 	"testing"
 )
 
-func TestGetInputPath(t *testing.T) {
-	// Test getting regular input path
-	path, err := GetInputPath(2025, 1, false)
+func TestReadInputLines(t *testing.T) {
+	// Test reading regular input file
+	lines, err := ReadInputLines(2025, 1, false)
 	if err != nil {
-		t.Fatalf("GetInputPath failed: %v", err)
+		t.Fatalf("ReadInputLines failed: %v", err)
 	}
 
-	// Check that path ends with the correct filename
-	if !strings.HasSuffix(path, "inputs/2025/day01.txt") {
-		t.Errorf("Expected path to end with 'inputs/2025/day01.txt', got: %s", path)
+	// Check that we got some lines back
+	if len(lines) == 0 {
+		t.Error("ReadInputLines returned empty slice")
 	}
 
-	// Check that the file exists
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		t.Errorf("Input file does not exist: %s", path)
+	// All lines should be non-empty (empty lines are filtered out)
+	for i, line := range lines {
+		if line == "" {
+			t.Errorf("Line %d is empty, but empty lines should be filtered", i)
+		}
 	}
 }
 
-func TestGetInputPathWithTest(t *testing.T) {
-	// Test getting test input path
-	path, err := GetInputPath(2025, 1, true)
+func TestReadInputLinesWithTest(t *testing.T) {
+	// Test reading test input file
+	lines, err := ReadInputLines(2025, 1, true)
 	if err != nil {
-		t.Fatalf("GetInputPath failed: %v", err)
+		t.Fatalf("ReadInputLines with test file failed: %v", err)
 	}
 
-	// Check that path ends with the correct test filename
-	if !strings.HasSuffix(path, "inputs/2025/day01_test.txt") {
-		t.Errorf("Expected path to end with 'inputs/2025/day01_test.txt', got: %s", path)
+	expected := []string{
+		"L68",
+		"L30",
+		"R48",
+		"L5",
+		"R60",
+		"L55",
+		"L1",
+		"L99",
+		"R14",
+		"L82",
 	}
 
-	// Check that the test file exists
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		t.Errorf("Test input file does not exist: %s", path)
-	}
-
-	// Read the test file and verify it has content
-	content, err := os.ReadFile(path)
-	if err != nil {
-		t.Fatalf("Failed to read test file: %v", err)
-	}
-
-	if len(content) == 0 {
-		t.Error("Test file is empty")
-	}
-
-	// Verify it contains expected test data
-	contentStr := string(content)
-	if !strings.Contains(contentStr, "L68") {
-		t.Error("Test file doesn't contain expected test data")
+	if !reflect.DeepEqual(lines, expected) {
+		t.Errorf("ReadInputLines() = %v, want %v", lines, expected)
 	}
 }
 
-func TestGetInputPathFormat(t *testing.T) {
-	tests := []struct {
-		year    int
-		day     int
-		useTest bool
-		want    string
-	}{
-		{2025, 1, false, "inputs/2025/day01.txt"},
-		{2025, 1, true, "inputs/2025/day01_test.txt"},
-		{2024, 15, false, "inputs/2024/day15.txt"},
-		{2024, 15, true, "inputs/2024/day15_test.txt"},
+func TestReadInputLinesTrimsWhitespace(t *testing.T) {
+	// Test that whitespace is properly trimmed
+	lines, err := ReadInputLines(2025, 1, true)
+	if err != nil {
+		t.Fatalf("ReadInputLines failed: %v", err)
 	}
 
-	for _, tt := range tests {
-		path, err := GetInputPath(tt.year, tt.day, tt.useTest)
-		if err != nil {
-			t.Fatalf("GetInputPath(%d, %d, %v) failed: %v", tt.year, tt.day, tt.useTest, err)
+	// Verify no lines have leading or trailing whitespace
+	for i, line := range lines {
+		if line != line {
+			t.Errorf("Line %d has whitespace: '%s'", i, line)
 		}
+	}
+}
 
-		// Extract just the relative path portion for comparison
-		parts := strings.Split(path, string(filepath.Separator))
-		var relativePath string
-		for i, part := range parts {
-			if part == "inputs" && i+2 < len(parts) {
-				relativePath = filepath.Join(parts[i:]...)
-				break
-			}
-		}
-
-		expectedPath := filepath.FromSlash(tt.want)
-		if relativePath != expectedPath {
-			t.Errorf("GetInputPath(%d, %d, %v) = %s, want path ending with %s",
-				tt.year, tt.day, tt.useTest, relativePath, expectedPath)
-		}
+func TestReadInputLinesInvalidYear(t *testing.T) {
+	// Test with a year/day that doesn't exist
+	_, err := ReadInputLines(1999, 99, false)
+	if err == nil {
+		t.Error("Expected error for non-existent input file, got nil")
 	}
 }

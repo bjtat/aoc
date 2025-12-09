@@ -1,32 +1,9 @@
-//go:build day01
-
 package main
 
 import (
 	"reflect"
 	"testing"
 )
-
-func TestGetFile(t *testing.T) {
-	expected := []string{
-		"L68",
-		"L30",
-		"R48",
-		"L5",
-		"R60",
-		"L55",
-		"L1",
-		"L99",
-		"R14",
-		"L82",
-	}
-
-	actual := GetFile()
-
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("GetFile() = %v, want %v", actual, expected)
-	}
-}
 
 func TestConvert(t *testing.T) {
 	lines := []string{
@@ -72,8 +49,8 @@ func TestComputeResult(t *testing.T) {
 		"L82",
 	}
 
-	expected := 3
-	actual := ComputeResult(lines)
+	expected := 6
+	actual, _ := ComputeResult(lines)
 
 	if actual != expected {
 		t.Errorf("ComputeResult() = %v, want %v", actual, expected)

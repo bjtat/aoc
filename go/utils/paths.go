@@ -2,13 +2,14 @@ package utils
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 )
 
-// GetRepoRoot returns the git repository root directory
-func GetRepoRoot() (string, error) {
+// getRepoRoot returns the git repository root directory
+func getRepoRoot() (string, error) {
 	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
 	output, err := cmd.Output()
 	if err != nil {
@@ -17,20 +18,44 @@ func GetRepoRoot() (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// GetInputPath returns the full path to an input file for a given year and day
+// getInputPath returns the full path to an input file for a given year and day
 // If useTest is true, returns the path to the test input file (day##_test.txt)
-func GetInputPath(year int, day int, useTest bool) (string, error) {
-	root, err := GetRepoRoot()
+func getInputPath(year int, day int, useTest bool) (string, error) {
+	root, err := getRepoRoot()
 	if err != nil {
 		return "", err
 	}
 
-	var filename string
+	var builder strings.Builder
+	builder.WriteString(fmt.Sprintf("inputs/%d/day%02d", year, day))
 	if useTest {
-		filename = fmt.Sprintf("inputs/%d/day%02d_test.txt", year, day)
-	} else {
-		filename = fmt.Sprintf("inputs/%d/day%02d.txt", year, day)
+		builder.WriteString("_test")
+	}
+	builder.WriteString(".txt")
+
+	return filepath.Join(root, builder.String()), nil
+}
+
+// ReadInputLines reads an input file and returns a slice of trimmed, non-empty lines
+func ReadInputLines(year int, day int, useTest bool) ([]string, error) {
+	inputPath, err := getInputPath(year, day, useTest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get input path: %w", err)
 	}
 
-	return filepath.Join(root, filename), nil
+	content, err := os.ReadFile(inputPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	lines := strings.Split(string(content), "\n")
+
+	result := make([]string, 0, len(lines))
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result, nil
 }

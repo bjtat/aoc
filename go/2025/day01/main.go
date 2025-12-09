@@ -1,5 +1,3 @@
-//go:build day01
-
 package main
 
 import (
@@ -7,34 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 )
-
-func GetFile() []string {
-	inputPath, err := utils.GetInputPath(2025, 1, false)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error getting input path: %v\n", err)
-		os.Exit(1)
-	}
-
-	content, err := os.ReadFile(inputPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
-		os.Exit(1)
-	}
-
-	file := string(content)
-	lines := strings.Split(file, "\n")
-
-	var result []string
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if trimmed != "" {
-			result = append(result, trimmed)
-		}
-	}
-	return result
-}
 
 func Convert(lines []string) []int {
 	var results []int
@@ -72,6 +43,7 @@ func GetAllExtraTurns(lines []string) int {
 func ComputeResult(lines []string) (int, int) {
 	dialPosition := 50
 	counter := 0
+	endOnZero := 0
 	dialStartedAtZero := false
 
 	turns := Convert(lines)
@@ -92,7 +64,7 @@ func ComputeResult(lines []string) (int, int) {
 
 		// When we land on exactly 0, we need to increment the counter
 		if dialPosition == 0 {
-			counter++
+			endOnZero++
 		}
 
 		// Reset dial position within bounds (0-99)
@@ -105,20 +77,21 @@ func ComputeResult(lines []string) (int, int) {
 		if dialPosition < 0 {
 			dialPosition += 100
 		}
-
-		fmt.Printf("The dial is now at position %d (counter: %d)\n", dialPosition, counter)
 	}
-	return counter, 0
+	return counter, endOnZero
 }
 
 func main() {
-	file := GetFile()
-	password, extraTurns := ComputeResult(file)
-	turns := GetAllExtraTurns(file)
-	totalTurns := password + extraTurns + turns
+	file, err := utils.ReadInputLines(2025, 1, true)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading 2025 Day 1 file: %v\n", err)
+		os.Exit(1)
+	}
 
-	fmt.Printf("Original password: %d\n", password)
-	fmt.Printf("Extra turns from passing 0: %d\n", extraTurns)
-	fmt.Printf("Extra turns from parsing movements: %d\n", turns)
+	password, endOnZero := ComputeResult(file)
+	extraTurns := GetAllExtraTurns(file)
+	totalTurns := password + endOnZero + extraTurns
+
+	fmt.Printf("Original password: %d\n", endOnZero)
 	fmt.Printf("Total turns: %d\n", totalTurns)
 }

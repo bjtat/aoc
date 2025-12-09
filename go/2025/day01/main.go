@@ -48,23 +48,21 @@ func ComputeResult(lines []string) (int, int) {
 
 	turns := Convert(lines)
 	for _, turn := range turns {
-		// Apply the turn
 		dialPosition += turn
 
-		// Count full rotations (above or below zero)
+		// Count full rotations in the positive direction
 		counter += dialPosition / 100
-		if dialPosition < 0 {
-			counter += (-dialPosition) / 100
-		}
 
-		// When we cross over to the negative we need to add one as the above floor will not count that
+		// If we pass zero in the negative direction, count it
+		// We check if the dial was already at zero when going negative because we don't
+		// want to double count "clicking to zero" (aka from landing on the following case in the prior turn)
 		if dialPosition < 0 && !dialStartedAtZero {
 			counter++
 		}
 
-		// When we land on exactly 0, we need to increment the counter
+		// When we land on exactly 0, we need to increment the counter for clicking to it
 		if dialPosition == 0 {
-			endOnZero++
+			counter++
 		}
 
 		// Reset dial position within bounds (0-99)
@@ -77,12 +75,19 @@ func ComputeResult(lines []string) (int, int) {
 		if dialPosition < 0 {
 			dialPosition += 100
 		}
+
+		// Counting for part 1 where we count the time we land on zero
+		if dialPosition == 0 {
+			endOnZero++
+		}
+
+		fmt.Printf("The dial is rotated %d to point to %d\n", turn, dialPosition)
 	}
 	return counter, endOnZero
 }
 
 func main() {
-	file, err := utils.ReadInputLines(2025, 1, true)
+	file, err := utils.ReadInputLines(2025, 1, false)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading 2025 Day 1 file: %v\n", err)
 		os.Exit(1)
@@ -90,7 +95,7 @@ func main() {
 
 	password, endOnZero := ComputeResult(file)
 	extraTurns := GetAllExtraTurns(file)
-	totalTurns := password + endOnZero + extraTurns
+	totalTurns := password + extraTurns
 
 	fmt.Printf("Original password: %d\n", endOnZero)
 	fmt.Printf("Total turns: %d\n", totalTurns)

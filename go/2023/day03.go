@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"aoc/go/utils"
+	"aoc/utils"
 )
 
 // we wants a map where k= gear coord and v = the numbers that are valid next to it

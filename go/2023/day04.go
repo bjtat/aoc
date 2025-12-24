@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"aoc/go/utils"
+	"aoc/utils"
 )
 
 func parseNumbers(line string) ([]string, []string) {

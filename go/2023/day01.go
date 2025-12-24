@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"aoc/go/utils"
+	"aoc/utils"
 )
 
 const (

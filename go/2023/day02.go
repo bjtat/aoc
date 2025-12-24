@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"aoc/go/utils"
+	"aoc/utils"
 )
 
 func parseGames(gamesList []string, gameId, r, g, b int) bool {

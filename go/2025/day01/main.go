@@ -1,7 +1,7 @@
 package main
 
 import (
-	"aoc/go/utils"
+	"aoc/utils"
 	"fmt"
 	"os"
 	"strconv"

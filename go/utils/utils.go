@@ -1,3 +1,4 @@
+// Package utils provides utility functions for AoC solutions.
 package utils
 
 import (
@@ -18,9 +19,9 @@ func getRepoRoot() (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// getInputPath returns the full path to an input file for a given year and day
+// GetInputPath returns the full path to an input file for a given year and day
 // If useTest is true, returns the path to the test input file (day##_test.txt)
-func getInputPath(year int, day int, useTest bool) (string, error) {
+func GetInputPath(year int, day int, useTest bool) (string, error) {
 	root, err := getRepoRoot()
 	if err != nil {
 		return "", err
@@ -38,7 +39,7 @@ func getInputPath(year int, day int, useTest bool) (string, error) {
 
 // ReadInputLines reads an input file and returns a slice of trimmed, non-empty lines
 func ReadInputLines(year int, day int, useTest bool) ([]string, error) {
-	inputPath, err := getInputPath(year, day, useTest)
+	inputPath, err := GetInputPath(year, day, useTest)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get input path: %w", err)
 	}

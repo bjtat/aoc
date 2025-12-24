@@ -1,13 +1,15 @@
-package utils
+package utils_test
 
 import (
+	"aoc/utils"
 	"reflect"
+	"strings"
 	"testing"
 )
 
 func TestReadInputLines(t *testing.T) {
 	// Test reading regular input file
-	lines, err := ReadInputLines(2025, 1, false)
+	lines, err := utils.ReadInputLines(2025, 1, false)
 	if err != nil {
 		t.Fatalf("ReadInputLines failed: %v", err)
 	}
@@ -27,7 +29,7 @@ func TestReadInputLines(t *testing.T) {
 
 func TestReadInputLinesWithTest(t *testing.T) {
 	// Test reading test input file
-	lines, err := ReadInputLines(2025, 1, true)
+	lines, err := utils.ReadInputLines(2025, 1, true)
 	if err != nil {
 		t.Fatalf("ReadInputLines with test file failed: %v", err)
 	}
@@ -52,22 +54,23 @@ func TestReadInputLinesWithTest(t *testing.T) {
 
 func TestReadInputLinesTrimsWhitespace(t *testing.T) {
 	// Test that whitespace is properly trimmed
-	lines, err := ReadInputLines(2025, 1, true)
+	lines, err := utils.ReadInputLines(2025, 1, true)
 	if err != nil {
 		t.Fatalf("ReadInputLines failed: %v", err)
 	}
 
 	// Verify no lines have leading or trailing whitespace
 	for i, line := range lines {
-		if line != line {
-			t.Errorf("Line %d has whitespace: '%s'", i, line)
+		trimmed := strings.TrimSpace(line)
+		if line != trimmed {
+			t.Errorf("Line %d has untrimmed whitespace: '%s'", i, line)
 		}
 	}
 }
 
 func TestReadInputLinesInvalidYear(t *testing.T) {
 	// Test with a year/day that doesn't exist
-	_, err := ReadInputLines(1999, 99, false)
+	_, err := utils.ReadInputLines(1999, 99, false)
 	if err == nil {
 		t.Error("Expected error for non-existent input file, got nil")
 	}
